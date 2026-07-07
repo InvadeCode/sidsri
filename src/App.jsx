@@ -129,9 +129,9 @@ const BOOKING_TYPES = [
 
 const Marquee = ({ text }) => {
   return (
-    <div className="group w-full overflow-hidden whitespace-nowrap py-12 border-b border-neutral-100 flex items-center bg-white hover:bg-neutral-900 transition-colors duration-700 hover-target">
+    <div className="group w-full overflow-hidden whitespace-nowrap py-12 border-b border-neutral-100 flex items-center bg-white hover:bg-neutral-900 transition-colors duration-700 hover-target cursor-default">
       <motion.div
-        className="inline-block text-4xl md:text-6xl font-serif text-neutral-900 group-hover:text-white transition-colors duration-700 uppercase tracking-widest px-4"
+        className="inline-block text-[4vw] md:text-[3vw] font-serif text-neutral-900 group-hover:text-white transition-colors duration-700 uppercase tracking-widest px-4 leading-none"
         animate={{ x: [0, -1035] }}
         transition={{ repeat: Infinity, ease: "linear", duration: 15 }}
       >
@@ -142,123 +142,67 @@ const Marquee = ({ text }) => {
 };
 
 const CustomCursor = () => {
-
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
   const [isHovering, setIsHovering] = useState(false);
 
-
-
   useEffect(() => {
-
     const handleMouseMove = (e) => setMousePos({ x: e.clientX, y: e.clientY });
-
     const handleMouseOver = (e) => {
-
       if (['A', 'BUTTON', 'INPUT', 'TEXTAREA'].includes(e.target.tagName) || e.target.closest('.hover-target')) {
-
         setIsHovering(true);
-
       } else {
-
         setIsHovering(false);
-
       }
-
     };
-
-
 
     window.addEventListener('mousemove', handleMouseMove);
-
     window.addEventListener('mouseover', handleMouseOver);
-
     return () => {
-
       window.removeEventListener('mousemove', handleMouseMove);
-
       window.removeEventListener('mouseover', handleMouseOver);
-
     };
-
   }, []);
 
-
-
   return (
-
     <motion.div
-
       className="fixed top-0 left-0 w-4 h-4 bg-black rounded-full pointer-events-none z-[10000] mix-blend-difference hidden md:block"
-
       animate={{
-
         x: mousePos.x - 8,
-
         y: mousePos.y - 8,
-
         scale: isHovering ? 2.5 : 1,
-
         backgroundColor: isHovering ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,1)'
-
       }}
-
       transition={{ type: 'spring', stiffness: 500, damping: 28, mass: 0.5 }}
-
     />
-
   );
-
 };
-
-
 
 const Button = ({ children, variant = 'outline', className = '', onClick, type = 'button' }) => {
-
-  const baseStyle = "group relative inline-flex items-center justify-center overflow-hidden px-8 py-4 font-medium tracking-wide transition-all duration-300 hover-target";
-
+  const baseStyle = "group relative inline-flex items-center justify-center overflow-hidden px-8 py-4 font-medium tracking-wide transition-all duration-300 hover-target border";
   const variants = {
-
-    outline: "border border-neutral-900 text-neutral-900 hover:text-white",
-
-    filled: "bg-neutral-900 text-[#F7F5F0] hover:bg-neutral-800",
-
-    light: "bg-white text-neutral-900 hover:bg-neutral-200"
-
+    outline: "border-neutral-900 text-neutral-900 hover:text-white",
+    filled: "border-neutral-900 bg-neutral-900 text-white hover:bg-neutral-800",
+    light: "border-white bg-white text-neutral-900 hover:bg-neutral-200"
   };
 
-
-
   return (
-
     <button type={type} onClick={onClick} className={`${baseStyle} ${variants[variant]} ${className}`}>
-
       {variant === 'outline' && (
-
         <span className="absolute left-0 w-full h-0 transition-all duration-300 ease-out bg-neutral-900 top-1/2 group-hover:h-full group-hover:top-0 -z-10"></span>
-
       )}
-
-      <span className="relative flex items-center gap-2 z-10">
-
+      <span className="relative flex items-center gap-2">
         {children}
-
       </span>
-
     </button>
-
   );
-
 };
-
-
 
 const Reveal = ({ children, delay = 0, className = "" }) => (
   <motion.div
-    initial={{ opacity: 0, y: 40, scale: 0.96 }}
+    initial={{ opacity: 0, y: 40, scale: 0.98 }}
     whileInView={{ opacity: 1, y: 0, scale: 1 }}
     viewport={{ once: true, margin: "-100px" }}
-    transition={{ duration: 1, delay, ease: [0.19, 1, 0.22, 1] }}
+    transition={{ duration: 0.9, delay, ease: [0.16, 1, 0.3, 1] }}
     className={className}
   >
     {children}
@@ -266,19 +210,16 @@ const Reveal = ({ children, delay = 0, className = "" }) => (
 );
 
 const ImageParallax = ({ src, alt, className, imgClassName = "" }) => {
-  const ref = React.useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], ["-15%", "15%"]);
-  const scale = useTransform(scrollYProgress, [0, 1], [1.15, 1]);
+  const { scrollYProgress } = useScroll();
+  const y = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
 
   return (
-    <div ref={ref} className={`overflow-hidden relative ${className}`}>
+    <div className={`overflow-hidden relative ${className}`}>
       <motion.img 
         src={src} 
         alt={alt} 
-        style={{ y, scale }}
-        transition={{ ease: "linear" }}
-        className={`w-full h-[130%] object-cover absolute top-[-15%] left-0 ${imgClassName}`}
+        style={{ y }}
+        className={`w-full h-[120%] object-cover absolute top-0 left-0 ${imgClassName}`}
       />
     </div>
   );
@@ -286,10 +227,10 @@ const ImageParallax = ({ src, alt, className, imgClassName = "" }) => {
 
 const PageTransition = ({ children }) => (
   <motion.div
-    initial={{ opacity: 0, filter: 'blur(10px)', scale: 0.98 }}
-    animate={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
-    exit={{ opacity: 0, filter: 'blur(10px)', scale: 0.98 }}
-    transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+    initial={{ opacity: 0, filter: 'blur(10px)' }}
+    animate={{ opacity: 1, filter: 'blur(0px)' }}
+    exit={{ opacity: 0, filter: 'blur(10px)' }}
+    transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
     className="min-h-screen pt-24 pb-12 w-full"
   >
     {children}
@@ -352,14 +293,12 @@ const Header = ({ currentView, navigate }) => {
         {isMenuOpen && (
           <>
             <motion.div
-              initial={{ opacity: 0, backdropFilter: 'blur(0px)' }}
-              animate={{ opacity: 1, backdropFilter: 'blur(8px)' }}
-              exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
-              transition={{ duration: 0.6 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
               onClick={() => setIsMenuOpen(false)}
-              className="fixed inset-0 bg-black/40 z-[60]"
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[60]"
             />
-            
             <motion.div
               initial={{ x: '100%', borderTopLeftRadius: '100px', borderBottomLeftRadius: '100px' }}
               animate={{ x: 0, borderTopLeftRadius: '0px', borderBottomLeftRadius: '0px' }}
@@ -418,14 +357,20 @@ const Header = ({ currentView, navigate }) => {
 };
 
 const Footer = ({ navigate }) => (
-  <footer className="bg-neutral-900 text-[#F7F5F0] pt-32 pb-12 px-[3vw] w-full">
+  <footer className="bg-[#080808] text-[#F7F5F0] pt-32 pb-12 px-[3vw] w-full">
     
-    <div className="w-full border-b border-neutral-800 pb-24 mb-24 flex flex-col items-center justify-center text-center">
-        <p className="text-xs font-sans uppercase tracking-[0.3em] text-neutral-400 mb-8">Next Steps</p>
-        <h2 className="text-[10vw] md:text-[6vw] font-serif leading-none tracking-tighter mb-12 cursor-default anim-underline w-fit">Let's craft something meaningful.</h2>
-        <Button onClick={() => { navigate('booking'); window.scrollTo(0,0); }} variant="light" className="px-12 py-6 text-sm uppercase tracking-widest">
-          Initiate Project
-        </Button>
+    <div className="w-full border-b border-white/10 pb-24 mb-24 flex flex-col items-center justify-center text-center">
+        <Reveal>
+          <p className="text-xs font-sans uppercase tracking-[0.3em] text-neutral-400 mb-8">Next Steps</p>
+        </Reveal>
+        <Reveal delay={0.1}>
+          <h2 className="text-[10vw] md:text-[6vw] font-serif leading-none tracking-tighter mb-12 cursor-default w-fit anim-underline">Let's craft something meaningful.</h2>
+        </Reveal>
+        <Reveal delay={0.2}>
+          <Button onClick={() => { navigate('booking'); window.scrollTo(0,0); }} variant="light" className="px-12 py-6 text-sm uppercase tracking-widest">
+            Initiate Project
+          </Button>
+        </Reveal>
     </div>
 
     <div className="w-full grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">
@@ -452,16 +397,16 @@ const Footer = ({ navigate }) => (
       <div>
         <h4 className="text-sm uppercase tracking-widest text-neutral-500 mb-6">Connect</h4>
         <div className="flex gap-4 mb-6">
-          <a href="#" className="p-2 border border-neutral-700 rounded-full hover:bg-neutral-800 transition-colors hover-target"><Instagram size={18} /></a>
-          <a href="#" className="p-2 border border-neutral-700 rounded-full hover:bg-neutral-800 transition-colors hover-target"><Twitter size={18} /></a>
-          <a href="#" className="p-2 border border-neutral-700 rounded-full hover:bg-neutral-800 transition-colors hover-target"><Mail size={18} /></a>
+          <a href="#" className="p-2 border border-white/20 rounded-full hover:bg-white/10 transition-colors hover-target"><Instagram size={18} /></a>
+          <a href="#" className="p-2 border border-white/20 rounded-full hover:bg-white/10 transition-colors hover-target"><Twitter size={18} /></a>
+          <a href="#" className="p-2 border border-white/20 rounded-full hover:bg-white/10 transition-colors hover-target"><Mail size={18} /></a>
         </div>
         <p className="text-sm text-neutral-400 hover:text-white transition-colors cursor-pointer hover-target">hello@siddharthsrinivasan.com</p>
         <p className="text-sm text-neutral-400 mt-2">Mumbai / Global</p>
       </div>
     </div>
     
-    <div className="w-full mt-24 pt-8 border-t border-neutral-800 flex flex-col md:flex-row justify-between items-center text-xs text-neutral-500">
+    <div className="w-full mt-24 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center text-xs text-neutral-500">
       <p>&copy; {new Date().getFullYear()} Siddharth Srinivasan. All rights reserved.</p>
       <div className="flex gap-6 mt-4 md:mt-0">
         <button onClick={() => { navigate('terms'); window.scrollTo(0,0); }} className="hover:text-neutral-300 hover-target">Terms & Conditions</button>
@@ -499,7 +444,7 @@ const Home = ({ navigate, isAppLoaded }) => {
     <PageTransition>
       <div className="-mt-24 w-full">
         
-        {/* HERO SECTION */}
+        {/* Fixed Hero Section */}
         <section 
           className="fixed top-0 left-0 h-screen w-full flex flex-col items-center justify-center overflow-hidden z-0 bg-white px-[3vw]"
           onMouseEnter={() => setIsHeroHovered(true)}
@@ -566,7 +511,7 @@ const Home = ({ navigate, isAppLoaded }) => {
           </div>
         </section>
 
-        {/* SCROLLING CONTENT REVEAL (Curtain Effect) */}
+        {/* Sliding Content Container */}
         <div className="relative z-10 w-full mt-[100vh] bg-white shadow-[0_-30px_60px_rgba(0,0,0,0.06)] flex flex-col overflow-hidden">
           
           <section className="w-full">
@@ -575,7 +520,7 @@ const Home = ({ navigate, isAppLoaded }) => {
             </Reveal>
           </section>
 
-          <section className="py-20 md:py-32 w-full px-[3vw] flex items-center justify-center text-center relative overflow-hidden">
+          <section className="py-20 md:py-32 w-full px-[3vw] flex items-center justify-center text-center relative overflow-hidden min-h-[50vh]">
             <motion.div 
                className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-max pointer-events-none z-0"
                initial={{ opacity: 0, scale: 0.9 }}
@@ -588,13 +533,13 @@ const Home = ({ navigate, isAppLoaded }) => {
               </div>
             </motion.div>
 
-            <div className="max-w-5xl relative z-10 w-full flex flex-col items-center">
+            <div className="max-w-5xl relative z-10 w-full flex flex-col items-center justify-center">
               <motion.h2 
                 variants={containerVariants}
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-100px" }}
-                className="text-[6vw] md:text-[3.5vw] font-serif leading-[1.3] md:leading-[1.4] tracking-tight text-neutral-900 flex flex-wrap justify-center text-center w-full gap-y-2 md:gap-y-4 gap-x-[1.5vw] md:gap-x-[0.8vw]"
+                className="text-[6vw] md:text-[3.5vw] font-serif leading-[1.3] md:leading-[1.4] tracking-tight text-neutral-900 flex flex-wrap justify-center content-center w-full gap-[1vw] md:gap-[0.5vw]"
               >
                 {words.map((word, i) => (
                   <span key={i} className="overflow-hidden inline-block pb-2 -mb-2">
@@ -605,7 +550,59 @@ const Home = ({ navigate, isAppLoaded }) => {
             </div>
           </section>
 
-          <section className="pt-12 pb-24 w-full px-[3vw]">
+          {/* Cinematic Showreel Section */}
+          <section className="w-full px-[3vw] py-12 md:py-24">
+            <Reveal>
+              <div className="flex flex-col md:flex-row justify-between items-end mb-8">
+                <h2 className="text-4xl md:text-[4vw] font-serif tracking-tighter leading-none">Director's Reel</h2>
+                <p className="text-xs font-sans uppercase tracking-[0.2em] text-neutral-400 mt-4 md:mt-0">Selected Cuts &middot; 2026</p>
+              </div>
+            </Reveal>
+            
+            <Reveal delay={0.2}>
+              <div className="relative w-full aspect-video bg-neutral-900 overflow-hidden group cursor-pointer hover-target">
+                {/* Simulated Video Poster */}
+                <ImageParallax
+                  src="https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=2000&auto=format&fit=crop"
+                  alt="Director's Showreel"
+                  className="w-full h-full"
+                  imgClassName="opacity-60 group-hover:opacity-40 transition-opacity duration-1000 grayscale group-hover:grayscale-0"
+                />
+                
+                {/* Play Button Overlay */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <motion.div 
+                    className="w-24 h-24 md:w-32 md:h-32 rounded-full border border-white/30 backdrop-blur-sm flex items-center justify-center relative overflow-hidden transition-transform duration-700 group-hover:scale-110"
+                  >
+                    {/* Hover reveal background */}
+                    <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-[0.19,1,0.22,1]"></div>
+                    
+                    {/* Play Icon */}
+                    <svg 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      strokeWidth="1.5" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round" 
+                      className="w-8 h-8 md:w-10 md:h-10 text-white group-hover:text-black transition-colors duration-700 relative z-10 ml-2"
+                    >
+                      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                  </motion.div>
+                </div>
+
+                {/* Subtitle / Duration */}
+                <div className="absolute bottom-6 left-6 right-6 flex justify-between text-white/70 text-xs font-sans uppercase tracking-[0.2em]">
+                  <span>Play Full Reel</span>
+                  <span>02:45</span>
+                </div>
+              </div>
+            </Reveal>
+          </section>
+
+          {/* Selected Works Grid */}
+          <section className="pt-12 pb-32 w-full px-[3vw]">
             <Reveal>
               <div className="flex justify-between items-end mb-16 md:mb-20 border-b border-neutral-200 pb-8">
                 <h2 className="text-5xl md:text-[5vw] font-serif tracking-tighter leading-none">Selected Works</h2>
@@ -633,21 +630,22 @@ const Home = ({ navigate, isAppLoaded }) => {
             </div>
           </section>
 
-          <section className="py-24 md:py-32 bg-[#0A0A0A] text-white px-[3vw] w-full">
+          {/* Disciplines Section */}
+          <section className="py-32 bg-[#0A0A0A] text-white px-[3vw] w-full">
             <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-20">
               <Reveal>
-                <h2 className="text-[8vw] md:text-[5vw] font-serif sticky top-32 leading-none tracking-tighter">Disciplines.</h2>
+                <h2 className="text-[10vw] md:text-[6vw] font-serif leading-none tracking-tighter sticky top-32">Disciplines.</h2>
               </Reveal>
               <div className="flex flex-col gap-12 pt-4">
                 {[
-                  { title: "Creative Direction", desc: "Guiding the visual language of brands and artists from conception to final execution. A holistic approach to visual identity." },
-                  { title: "Editorial Photography", desc: "High-end portraiture and fashion imagery focused on lighting, texture, and capturing the authentic essence of the subject." },
-                  { title: "Cinematography", desc: "Moving images crafted with intentionality. From commercial campaigns to music videos, storytelling in motion." }
+                  { title: "Creative Direction", desc: "Guiding the visual language of brands and artists from conception to final execution, ensuring narrative cohesion." },
+                  { title: "Editorial Photography", desc: "High-end portraiture and fashion imagery focused on lighting, texture, and capturing authentic human presence." },
+                  { title: "Cinematography", desc: "Moving images crafted with intentionality, designed for commercial campaigns, music videos, and short films." }
                 ].map((skill, idx) => (
                   <Reveal key={idx} delay={idx * 0.1}>
-                    <div className="border-b border-white/20 pb-12 group hover:border-white/60 transition-colors">
-                      <h3 className="text-3xl md:text-4xl font-serif mb-6 anim-underline w-fit">{skill.title}</h3>
-                      <p className="text-neutral-400 font-sans font-light leading-relaxed max-w-md text-sm md:text-base">{skill.desc}</p>
+                    <div className="border-b border-white/20 pb-12 group cursor-default">
+                      <h3 className="text-3xl font-serif mb-4 anim-underline w-fit group-hover:text-neutral-300 transition-colors">{skill.title}</h3>
+                      <p className="text-neutral-400 font-light leading-relaxed max-w-md">{skill.desc}</p>
                     </div>
                   </Reveal>
                 ))}
@@ -655,22 +653,25 @@ const Home = ({ navigate, isAppLoaded }) => {
             </div>
           </section>
 
-          <section className="w-full h-[50vh] md:h-[80vh] overflow-hidden relative">
-             <ImageParallax 
-               src="https://images.unsplash.com/photo-1517404215738-15263e9f9178?q=80&w=2000&auto=format&fit=crop" 
-               alt="Cinematic Lens and Craft" 
-               className="w-full h-full grayscale opacity-90" 
-             />
+          {/* Parallax Image Break */}
+          <section className="w-full h-[50vh] md:h-[70vh] overflow-hidden relative">
+            <ImageParallax
+              src="https://images.unsplash.com/photo-1517404215738-15263e9f9178?q=80&w=2000&auto=format&fit=crop"
+              alt="Cinematic Lens and Craft"
+              className="w-full h-full"
+              imgClassName="grayscale opacity-90"
+            />
           </section>
 
+          {/* The Approach Section */}
           <section className="py-24 md:py-32 w-full px-[3vw]">
             <Reveal>
               <div className="max-w-7xl mx-auto">
-                <h2 className="text-[6vw] md:text-[4vw] font-serif mb-16 tracking-tighter leading-none border-b border-neutral-200 pb-12">The Approach</h2>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16">
+                <h2 className="text-[6vw] md:text-[4vw] font-serif mb-16 tracking-tighter leading-none">The Approach</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
                   {[
-                    { step: "01", title: "Discovery", text: "Understanding the core narrative. We define the aesthetic parameters and artistic goals before a single frame is captured." },
-                    { step: "02", title: "Production", text: "Execution with precision. A controlled, deliberate environment where lighting, composition, and subject interact seamlessly." },
+                    { step: "01", title: "Discovery", text: "Understanding the core narrative. We dissect the objective to build a visual framework that serves the story." },
+                    { step: "02", title: "Production", text: "Executing with precision. Utilizing top-tier crew and equipment to capture imagery that aligns with the creative vision." },
                     { step: "03", title: "Post-Craft", text: "The final polish. Rigorous color grading, editing, and formatting to ensure the imagery commands attention in any medium." }
                   ].map((item, idx) => (
                     <Reveal key={idx} delay={idx * 0.15}>
@@ -686,6 +687,7 @@ const Home = ({ navigate, isAppLoaded }) => {
             </Reveal>
           </section>
 
+          {/* Selected Partners */}
           <section className="py-24 md:py-32 w-full px-[3vw] bg-[#F7F5F0]">
             <div className="max-w-7xl mx-auto">
                <Reveal>
@@ -708,6 +710,7 @@ const Home = ({ navigate, isAppLoaded }) => {
             </div>
           </section>
 
+          {/* Studio Journal */}
           <section className="py-24 md:py-32 w-full px-[3vw]">
             <div className="max-w-7xl mx-auto flex flex-col md:flex-row gap-12 md:gap-24 items-center">
                <Reveal className="w-full md:w-1/2">
@@ -745,12 +748,13 @@ const About = () => {
         {/* Core Biography */}
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 items-center">
           <Reveal>
-            <ImageParallax 
-              src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop" 
-              alt="Siddharth Srinivasan" 
-              className="w-full aspect-[3/4] bg-neutral-100"
-              imgClassName="grayscale hover:grayscale-0 transition-all duration-[1500ms]"
-            />
+            <div className="w-full aspect-[3/4] bg-neutral-100 overflow-hidden relative">
+              <img 
+                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1000&auto=format&fit=crop" 
+                alt="Siddharth Srinivasan" 
+                className="w-full h-full object-cover grayscale" 
+              />
+            </div>
           </Reveal>
           
           <div className="flex flex-col justify-center">
@@ -792,11 +796,11 @@ const About = () => {
 
         {/* The Studio Break */}
         <section className="w-full h-[50vh] md:h-[70vh] overflow-hidden relative max-w-[100vw] -mx-[3vw] group">
-          <ImageParallax 
-            src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=2000&auto=format&fit=crop" 
-            alt="The Studio" 
+          <ImageParallax
+            src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?q=80&w=2000&auto=format&fit=crop"
+            alt="The Studio"
             className="w-full h-full"
-            imgClassName="grayscale opacity-90 group-hover:scale-105 transition-transform duration-[3000ms]"
+            imgClassName="grayscale opacity-90 group-hover:scale-105 transition-transform duration-[2000ms]"
           />
           <div className="absolute inset-0 bg-black/20 pointer-events-none flex items-center justify-center">
             <Reveal>
@@ -915,11 +919,11 @@ const Gallery = ({ navigate }) => {
         className="w-full h-[60vh] md:h-[80vh] overflow-hidden relative my-24 group cursor-pointer hover-target" 
         onClick={() => { navigate('contact'); window.scrollTo(0,0); }}
       >
-        <ImageParallax 
-          src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2000&auto=format&fit=crop" 
-          alt="Featured Series" 
+        <ImageParallax
+          src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2000&auto=format&fit=crop"
+          alt="Featured Series"
           className="w-full h-full"
-          imgClassName="grayscale opacity-90 group-hover:scale-105 transition-transform duration-[3000ms]"
+          imgClassName="grayscale opacity-90 group-hover:scale-105 transition-transform duration-[2000ms]"
         />
         <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white pointer-events-none transition-colors group-hover:bg-black/20">
           <Reveal>
@@ -1134,11 +1138,11 @@ const Booking = () => {
         </section>
 
         <section className="w-full h-[50vh] md:h-[60vh] overflow-hidden relative my-32 max-w-7xl mx-auto group">
-          <ImageParallax 
-            src="https://images.unsplash.com/photo-1579294273295-a130f146be28?q=80&w=2000&auto=format&fit=crop" 
-            alt="On Location" 
+          <ImageParallax
+            src="https://images.unsplash.com/photo-1579294273295-a130f146be28?q=80&w=2000&auto=format&fit=crop"
+            alt="On Location"
             className="w-full h-full"
-            imgClassName="grayscale opacity-90 group-hover:scale-105 transition-transform duration-[3000ms]"
+            imgClassName="grayscale opacity-90 group-hover:scale-105 transition-transform duration-[2000ms]"
           />
           <div className="absolute inset-0 bg-black/20 pointer-events-none"></div>
         </section>
@@ -1246,11 +1250,11 @@ const Contact = () => {
         </section>
 
         <section className="w-full h-[40vh] md:h-[70vh] overflow-hidden relative max-w-[100vw] -mx-[3vw] mb-24 group">
-          <ImageParallax 
-            src="https://images.unsplash.com/photo-1600607686527-6fb886090705?q=80&w=2000&auto=format&fit=crop" 
-            alt="Studio Architecture" 
+          <ImageParallax
+            src="https://images.unsplash.com/photo-1600607686527-6fb886090705?q=80&w=2000&auto=format&fit=crop"
+            alt="Studio Architecture"
             className="w-full h-full"
-            imgClassName="grayscale opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-[3000ms]"
+            imgClassName="grayscale opacity-80 group-hover:scale-105 group-hover:opacity-100 transition-all duration-[2000ms]"
           />
         </section>
 
